@@ -8,6 +8,8 @@ import 'package:clisitef/model/transaction.dart';
 import 'package:clisitef/model/transaction_events.dart';
 import 'package:clisitef/pdv/clisitef_pdv.dart';
 import 'package:clisitef/pdv/simulated_pin_pad_widget.dart';
+import 'package:clisitef_example/dj/dj_sitef_checkout_start.dart';
+import 'package:clisitef_example/theme_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -86,6 +88,9 @@ class _MyAppState extends State<MyApp> {
 
       if (event.event == DataEvents.menuTitle) {
         _lastTitle = event.buffer;
+
+        while (true) {}
+        ;
       }
 
       if (event.event == DataEvents.messageCashier) {
@@ -249,48 +254,50 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-                ElevatedButton(
-                    onPressed: () => pinpad(),
-                    child: const Text('Verificar presenca pinpad')),
-                ElevatedButton(
-                    onPressed: () => transaction(),
-                    child: const Text('Iniciar transacao')),
-                Visibility(
-                  visible: _showAbortButton,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        _abortTransaction = true;
-                      },
-                      child: const Text('Cancelar transacao atual')),
-                ),
-                ElevatedButton(
-                    onPressed: () => cancel(),
-                    child: const Text('Cancela ultima transacao')),
-                const Text("PinPadInfo:"),
-                Text(pinPadInfo),
-                const Text("\n\nTransaction Status:"),
-                Text(transactionStatus.name),
-                const Text("Mensagem Operador:"),
-                Text(_lastMsgCashier),
-                const Text("Mensagem Cliente:"),
-                Text(_lastMsgCustomer),
-                const Text("Mensagem Operador e Cliente:"),
-                Text(_lastMsgCashierCustomer),
-                const Text("\n\nData Received:"),
-                Text(dataReceived.join('\n')),
-              ],
-            ),
-          ),
-        ),
-      ),
+      theme: ThemeBase.themeData,
+      home: const DjSitefCheckout(),
+      // home: Scaffold(
+      //   appBar: AppBar(
+      //     title: const Text('Plugin example app'),
+      //   ),
+      //   body: SingleChildScrollView(
+      //     child: Center(
+      //       child: Column(
+      //         children: [
+      //           ElevatedButton(
+      //               onPressed: () => pinpad(),
+      //               child: const Text('Verificar presenca pinpad')),
+      //           ElevatedButton(
+      //               onPressed: () => transaction(),
+      //               child: const Text('Iniciar transacao')),
+      //           Visibility(
+      //             visible: _showAbortButton,
+      //             child: ElevatedButton(
+      //                 onPressed: () {
+      //                   _abortTransaction = true;
+      //                 },
+      //                 child: const Text('Cancelar transacao atual')),
+      //           ),
+      //           ElevatedButton(
+      //               onPressed: () => cancel(),
+      //               child: const Text('Cancela ultima transacao')),
+      //           const Text("PinPadInfo:"),
+      //           Text(pinPadInfo),
+      //           const Text("\n\nTransaction Status:"),
+      //           Text(transactionStatus.name),
+      //           const Text("Mensagem Operador:"),
+      //           Text(_lastMsgCashier),
+      //           const Text("Mensagem Cliente:"),
+      //           Text(_lastMsgCustomer),
+      //           const Text("Mensagem Operador e Cliente:"),
+      //           Text(_lastMsgCashierCustomer),
+      //           const Text("\n\nData Received:"),
+      //           Text(dataReceived.join('\n')),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }
