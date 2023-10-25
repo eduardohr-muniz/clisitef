@@ -40,11 +40,11 @@ class CliSiTefListener(private val cliSiTef: CliSiTef): ICliSiTefListener {
             CliSiTef.CMD_CLEAR_MENU_TITLE -> clisitefData = CliSiTefData(DataEvents.MENU_TITLE, currentStage, cliSiTef.buffer)
             CliSiTef.CMD_SHOW_HEADER,
             CliSiTef.CMD_CLEAR_HEADER -> clisitefData = CliSiTefData(DataEvents.HEADER_SHOW, currentStage, cliSiTef.buffer)
-            CliSiTef.CMD_CONFIRM_GO_BACK -> clisitefData = CliSiTefData(DataEvents.CONFIRM_GO_BACK, currentStage, cliSiTef.buffer)
-            CliSiTef.CMD_CONFIRMATION -> clisitefData = CliSiTefData(DataEvents.CONFIRMATION, currentStage, cliSiTef.buffer)            
+            CliSiTef.CMD_CONFIRM_GO_BACK -> clisitefData = CliSiTefData(DataEvents.CONFIRM_GO_BACK, currentStage, cliSiTef.buffer, false)
+            CliSiTef.CMD_CONFIRMATION -> clisitefData = CliSiTefData(DataEvents.CONFIRMATION, currentStage, cliSiTef.buffer, false)            
             CliSiTef.CMD_GET_MENU_OPTION -> clisitefData = CliSiTefData(DataEvents.MENU_OPTIONS, currentStage, cliSiTef.buffer, false)
-            CliSiTef.CMD_PRESS_ANY_KEY -> clisitefData = CliSiTefData(DataEvents.PRESS_ANY_KEY, currentStage, cliSiTef.buffer)
-            CliSiTef.CMD_ABORT_REQUEST -> clisitefData = CliSiTefData(DataEvents.ABORT_REQUEST, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
+            CliSiTef.CMD_PRESS_ANY_KEY -> clisitefData = CliSiTefData(DataEvents.PRESS_ANY_KEY, currentStage, cliSiTef.buffer, false)
+            CliSiTef.CMD_ABORT_REQUEST -> clisitefData = CliSiTefData(DataEvents.ABORT_REQUEST, currentStage, cliSiTef.buffer)
             CliSiTef.CMD_GET_FIELD_INTERNAL -> clisitefData = CliSiTefData(DataEvents.GET_FIELD_INTERNAL, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
             CliSiTef.CMD_GET_FIELD -> clisitefData = CliSiTefData(DataEvents.GET_FIELD, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
             CliSiTef.CMD_GET_FIELD_CHEQUE -> clisitefData = CliSiTefData(DataEvents.GET_FIELD_CHEQUE, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
@@ -54,9 +54,9 @@ class CliSiTefListener(private val cliSiTef: CliSiTef): ICliSiTefListener {
             CliSiTef.CMD_GET_FIELD_BARCODE -> clisitefData = CliSiTefData(DataEvents.GET_FIELD_BARCODE, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
             CliSiTef.CMD_GET_PINPAD_CONFIRMATION -> clisitefData = CliSiTefData(DataEvents.GET_PINPAD_CONFIRMATION, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)            
             CliSiTef.CMD_GET_MASKED_FIELD -> clisitefData = CliSiTefData(DataEvents.GET_MASKED_FIELD, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
-            CliSiTef.CMD_SHOW_QRCODE_FIELD -> clisitefData = CliSiTefData(DataEvents.SHOW_QRCODE_FIELD, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
-            CliSiTef.CMD_REMOVE_QRCODE_FIELD -> clisitefData = CliSiTefData(DataEvents.REMOVE_QRCODE_FIELD, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
-            CliSiTef.CMD_MESSAGE_QRCODE -> clisitefData = CliSiTefData(DataEvents.MESSAGE_QRCODE, currentStage, cliSiTef.buffer, false, maxLength = maxLength, minLength = minLength)
+            CliSiTef.CMD_SHOW_QRCODE_FIELD -> clisitefData = CliSiTefData(DataEvents.SHOW_QRCODE_FIELD, currentStage, cliSiTef.buffer)
+            CliSiTef.CMD_REMOVE_QRCODE_FIELD -> clisitefData = CliSiTefData(DataEvents.REMOVE_QRCODE_FIELD, currentStage, cliSiTef.buffer)
+            CliSiTef.CMD_MESSAGE_QRCODE -> clisitefData = CliSiTefData(DataEvents.MESSAGE_QRCODE, currentStage, cliSiTef.buffer)
             else -> Log.i("CliSiTefListener", "onData Default case for command $command")
         }
 

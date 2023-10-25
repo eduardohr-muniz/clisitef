@@ -1,11 +1,14 @@
 library clisitef;
 
 enum Modalidade {
-  generic(0),
-  debit(2),
-  credit(3),
+  generico(0),
+  cheque(1),
+  debito(2),
+  credito(3),
   voucher(5),
-  test(6);
+  teste(6),
+  vendaCarteiraDigital(122),
+  cancelamentoCarteiraDigital(123);
 
   const Modalidade(this.value);
   final int value;

@@ -61,6 +61,7 @@ class _MyAppState extends State<MyApp> {
       cnpjLoja: '05481336000137',
       tipoPinPad: TipoPinPad.usb,
     );
+
     pdv = CliSiTefPDV(
         client: _clisitefPlugin,
         configuration: configuration,
@@ -100,11 +101,111 @@ class _MyAppState extends State<MyApp> {
         _lastMsgCashierCustomer = event.buffer;
       }
 
+      if (event.event == DataEvents.messageQrCode) {
+        _lastMsgCashierCustomer = event.buffer;
+      }
+
+      if ((event.event == DataEvents.showQrCodeField) ||
+          (event.event == DataEvents.removeQrCodeField)) {
+        _lastMsgCashierCustomer = event.buffer;
+      }
+
+      if (event.event == DataEvents.confirmation) {
+        Widget cancelButton = ElevatedButton(
+          child: const Text("Cancelar"),
+          onPressed: () {
+            pdv.client.continueTransaction('0');
+            Navigator.of(context).pop();
+          },
+        );
+        Widget continueButton = ElevatedButton(
+          child: const Text("Continuar"),
+          onPressed: () {
+            pdv.client.continueTransaction('1');
+            Navigator.of(context).pop();
+          },
+        );
+
+        AlertDialog alert = AlertDialog(
+          title: Text(event.buffer),
+          actions: [
+            cancelButton,
+            continueButton,
+          ],
+        );
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return alert;
+          },
+        );
+      }
+
+      if (event.event == DataEvents.confirmGoBack) {
+        Widget backButton = ElevatedButton(
+          child: const Text("Voltar"),
+          onPressed: () {
+            pdv.client.continueTransaction('1');
+            Navigator.of(context).pop();
+          },
+        );
+        Widget confirmeButton = ElevatedButton(
+          child: const Text("Confirmar"),
+          onPressed: () {
+            pdv.client.continueTransaction('0');
+            Navigator.of(context).pop();
+          },
+        );
+
+        AlertDialog alert = AlertDialog(
+          title: Text(event.buffer),
+          actions: [
+            backButton,
+            confirmeButton,
+          ],
+        );
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return alert;
+          },
+        );
+      }
+
+      if (event.event == DataEvents.pressAnyKey) {
+        Widget continueButton = ElevatedButton(
+          child: const Text("Continuar"),
+          onPressed: () {
+            pdv.client.continueTransaction('1');
+            Navigator.of(context).pop();
+          },
+        );
+
+        AlertDialog alert = AlertDialog(
+          title: Text(event.buffer),
+          actions: [
+            continueButton,
+          ],
+        );
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return alert;
+          },
+        );
+      }
+
       if (event.event == DataEvents.abortRequest) {
         setState(() {
           _showAbortButton = true;
           if (_abortTransaction) {
-            pdv.cancelTransaction();
+            //pdv.client.abortTransaction(continua: 1);
+            //pdv.client.finishLastTransaction(false);
+            //pdv.continueTransaction('0');
+            cancelCurrentTransaction();
             _showAbortButton = false;
             _abortTransaction = false;
           } else {
@@ -164,22 +265,7 @@ class _MyAppState extends State<MyApp> {
             });
       }
 
-      setState(() {
-        if (event.event == DataEvents.data) {
-          if (event.isClientInvoice()) {
-            dataReceived.add("Client Invoice:${event.buffer}");
-          }
-          if (event.isCompanyInvoice()) {
-            dataReceived.add("Company Invoice:${event.buffer}");
-          }
-
-          dataReceived.add("Campo: ${event.fieldId} - Valor: ${event.buffer}");
-        } else {
-          if (event.buffer != "") {
-            dataReceived.add(event.buffer);
-          }
-        }
-      });
+      setState(() {});
     });
   }
 
@@ -189,6 +275,9 @@ class _MyAppState extends State<MyApp> {
 
       setState(() {
         PinPadInformation pinPad = pdv.pinPadStream.pinPadInfo;
+        if (pinPad.isPresent) {
+          pdv.client.setPinpadDisplayMessage('XPOS - DJSystem');
+        }
         pinPadInfo =
             'isPresent: ${pinPad.isPresent.toString()} \n isBluetoothEnabled: ${pinPad.isBluetoothEnabled.toString()} \n isConnected: ${pinPad.isConnected.toString()} \n isReady: ${pinPad.isReady.toString()} \n event: ${pinPad.event.toString()} ';
       });
@@ -205,10 +294,11 @@ class _MyAppState extends State<MyApp> {
         dataReceived = [];
       });
       Stream<Transaction> paymentStream = await pdv.payment(
-        Modalidade.credit.value,
+        Modalidade.credito.value,
         100,
         cupomFiscal: '1',
         dataFiscal: DateTime.now(),
+        restricoes: '[27;28]',
       );
 
       if (_isSimulated) {
@@ -220,6 +310,16 @@ class _MyAppState extends State<MyApp> {
       paymentStream.listen((Transaction transaction) {
         setState(() {
           transactionStatus = transaction.event ?? TransactionEvents.unknown;
+          if (transactionStatus == TransactionEvents.transactionConfirm) {
+            dataReceived.add(
+                pdv.cliSitetRespMap[134]!); //Map com todos os campos retornados
+
+            //campos mapeados em propriedades
+            dataReceived.add(pdv.cliSiTefResp.nsuHost);
+            dataReceived.add(pdv.cliSiTefResp.viaCliente);
+
+            dataReceived.add(pdv.cliSiTefResp.viaEstabelecimento);
+          }
         });
       });
     } on Exception catch (e) {
@@ -227,6 +327,17 @@ class _MyAppState extends State<MyApp> {
         transactionStatus = TransactionEvents.transactionError;
       });
       if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
+  void cancelCurrentTransaction() async {
+    try {
+      await pdv.client.abortTransaction(continua: 1);
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('Cancel!');
         print(e.toString());
       }
     }

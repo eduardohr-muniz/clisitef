@@ -5,12 +5,12 @@ import 'package:clisitef/model/data_events.dart';
 class CliSiTefData {
   CliSiTefData(
       {required this.event,
-        required this.currentStage,
-        required this.buffer,
-        required this.waiting,
-        this.fieldId = 0,
-        this.maxLength = 0,
-        this.minLength = 0});
+      required this.currentStage,
+      required this.buffer,
+      required this.waiting,
+      this.fieldId = 0,
+      this.maxLength = 0,
+      this.minLength = 0});
 
   DataEvents event;
 
