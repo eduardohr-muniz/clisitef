@@ -3,9 +3,9 @@ library clisitef;
 import 'package:clisitef/clisitef_sdk.dart';
 import 'package:clisitef/model/clisitef_data.dart';
 import 'package:clisitef/model/data_events.dart';
-import 'package:clisitef/model/modalidade.dart';
 import 'package:clisitef/model/pinpad_events.dart';
 import 'package:clisitef/model/pinpad_information.dart';
+import 'package:clisitef/model/tipo_pinpad.dart';
 import 'package:clisitef/model/transaction_events.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -64,14 +64,21 @@ class CliSiTefAndroid implements CliSiTefSDK {
 
   /// If an error occurs it throw an
   /// [PlatformException] with status code related to the error
-  Future<bool> configure(String enderecoSitef, String codigoLoja,
-      String numeroTerminal, String cnpjEmpresa, String cnpjLoja) async {
+  Future<bool> configure(
+    String enderecoSitef,
+    String codigoLoja,
+    String numeroTerminal,
+    String cnpjEmpresa,
+    String cnpjLoja,
+    TipoPinPad tipoPinPad,
+  ) async {
     bool? success = await _methodChannel.invokeMethod<bool>('configure', {
       'enderecoSitef': enderecoSitef,
       'codigoLoja': codigoLoja.padLeft(8, '0'),
       'numeroTerminal': numeroTerminal.padLeft(8, '0'),
       'cnpjEmpresa': cnpjEmpresa,
-      'cnpjLoja': cnpjLoja
+      'cnpjLoja': cnpjLoja,
+      'tipoPinPad': tipoPinPad.value,
     });
 
     return success ?? false;
@@ -146,12 +153,12 @@ class CliSiTefAndroid implements CliSiTefSDK {
   }
 
   @override
-  Future<bool> startTransaction(Modalidade modalidade, double valor,
+  Future<bool> startTransaction(int modalidade, double valor,
       String cupomFiscal, DateTime dataFiscal, String operador) async {
     NumberFormat f = NumberFormat("############.00", "pt");
     bool? success =
         await _methodChannel.invokeMethod<bool>('startTransaction', {
-      'modalidade': modalidade.value,
+      'modalidade': modalidade,
       'valor': f.format(valor),
       'cupomFiscal': cupomFiscal,
       'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal),

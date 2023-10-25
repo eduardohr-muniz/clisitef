@@ -1,12 +1,15 @@
 library clisitef;
 
+import 'package:clisitef/model/tipo_pinpad.dart';
+
 class CliSiTefConfiguration {
   CliSiTefConfiguration(
       {required this.enderecoSitef,
       required this.codigoLoja,
       required this.numeroTerminal,
       required this.cnpjLoja,
-      required this.cnpjEmpresa});
+      required this.cnpjEmpresa,
+      required this.tipoPinPad});
 
   final String enderecoSitef;
 
@@ -17,4 +20,6 @@ class CliSiTefConfiguration {
   final String cnpjLoja;
 
   final String cnpjEmpresa;
+
+  final TipoPinPad tipoPinPad;
 }

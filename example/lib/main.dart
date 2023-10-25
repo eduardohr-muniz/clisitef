@@ -1,14 +1,14 @@
-import 'dart:convert';
-
 import 'package:clisitef/model/clisitef_configuration.dart';
 import 'package:clisitef/model/clisitef_data.dart';
 import 'package:clisitef/model/data_events.dart';
 import 'package:clisitef/model/modalidade.dart';
 import 'package:clisitef/model/pinpad_information.dart';
+import 'package:clisitef/model/tipo_pinpad.dart';
 import 'package:clisitef/model/transaction.dart';
 import 'package:clisitef/model/transaction_events.dart';
 import 'package:clisitef/pdv/clisitef_pdv.dart';
 import 'package:clisitef/pdv/simulated_pin_pad_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
 
   String pinPadInfo = '';
 
-  bool _isSimulated = true;
+  final bool _isSimulated = false; //Indicate if has PinPad
 
   TransactionEvents transactionStatus = TransactionEvents.unknown;
 
@@ -40,16 +40,36 @@ class _MyAppState extends State<MyApp> {
 
   String _lastTitle = '';
 
+  String _lastMsgCustomer = '';
+
+  String _lastMsgCashier = '';
+
+  String _lastMsgCashierCustomer = '';
+
+  bool _showAbortButton = false;
+
+  bool _abortTransaction = false;
+
   @override
   void initState() {
     super.initState();
     CliSiTefConfiguration configuration = CliSiTefConfiguration(
-        enderecoSitef: '10.211.55.3', codigoLoja: '0', numeroTerminal: '1');
+      enderecoSitef: '172.16.93.132',
+      codigoLoja: '0',
+      numeroTerminal: '1',
+      cnpjEmpresa: '05481336000137',
+      cnpjLoja: '05481336000137',
+      tipoPinPad: TipoPinPad.usb,
+    );
     pdv = CliSiTefPDV(
         client: _clisitefPlugin,
         configuration: configuration,
         isSimulated: _isSimulated);
 
+    configureCliSitefCallbacks();
+  }
+
+  void configureCliSitefCallbacks() {
     pdv.pinPadStream.stream.listen((PinPadInformation event) {
       setState(() {
         PinPadInformation pinPad = event;
@@ -59,23 +79,91 @@ class _MyAppState extends State<MyApp> {
     });
 
     pdv.dataStream.stream.listen((CliSiTefData event) {
-
-      print(event.buffer);
-      print(event.event);
+      if (kDebugMode) {
+        print(event.buffer);
+        print(event.event);
+      }
 
       if (event.event == DataEvents.menuTitle) {
         _lastTitle = event.buffer;
       }
 
-      if (event.event == DataEvents.menuOptions || event.event == DataEvents.getField) {
+      if (event.event == DataEvents.messageCashier) {
+        _lastMsgCashier = event.buffer;
+      }
+
+      if (event.event == DataEvents.messageCustomer) {
+        _lastMsgCustomer = event.buffer;
+      }
+
+      if (event.event == DataEvents.messageCashierCustomer) {
+        _lastMsgCashierCustomer = event.buffer;
+      }
+
+      if (event.event == DataEvents.abortRequest) {
+        setState(() {
+          _showAbortButton = true;
+          if (_abortTransaction) {
+            pdv.cancelTransaction();
+            _showAbortButton = false;
+            _abortTransaction = false;
+          } else {
+            pdv.continueTransaction('1');
+          }
+        });
+      } else {
+        _showAbortButton = false;
+      }
+
+      if (event.event == DataEvents.getFieldInternal ||
+          event.event == DataEvents.getField ||
+          event.event == DataEvents.getFieldBarCode ||
+          event.event == DataEvents.getFieldCurrency) {
         showDialog(
             context: context,
             builder: (context) {
-              return SimulatedPinPadWidget(title: _lastTitle, options: event.buffer, submit: (id) {
-                pdv.continueTransaction(id);
-              },);
+              return SimulatedPinPadWidget(
+                title: _lastTitle,
+                options: event.buffer,
+                submit: pdv.continueTransaction,
+                cancel: () async {
+                  pdv.continueTransaction('-1');
+                },
+              );
             });
       }
+
+      if (event.event == DataEvents.menuOptions) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              List<String> options = event.buffer.split(';');
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(_lastTitle),
+                  automaticallyImplyLeading: false,
+                ),
+                body: ListView.builder(
+                  itemCount: options.length - 1,
+                  itemBuilder: (context, index) {
+                    final item = options[index].split(':');
+                    final opcao = item[0];
+                    final descricao = item[1];
+
+                    return ListTile(
+                      title: Text(descricao),
+                      subtitle: Text(opcao),
+                      onTap: () {
+                        pdv.continueTransaction(opcao);
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                ),
+              );
+            });
+      }
+
       setState(() {
         if (event.event == DataEvents.data) {
           if (event.isClientInvoice()) {
@@ -84,6 +172,8 @@ class _MyAppState extends State<MyApp> {
           if (event.isCompanyInvoice()) {
             dataReceived.add("Company Invoice:${event.buffer}");
           }
+
+          dataReceived.add("Campo: ${event.fieldId} - Valor: ${event.buffer}");
         } else {
           if (event.buffer != "") {
             dataReceived.add(event.buffer);
@@ -103,18 +193,28 @@ class _MyAppState extends State<MyApp> {
             'isPresent: ${pinPad.isPresent.toString()} \n isBluetoothEnabled: ${pinPad.isBluetoothEnabled.toString()} \n isConnected: ${pinPad.isConnected.toString()} \n isReady: ${pinPad.isReady.toString()} \n event: ${pinPad.event.toString()} ';
       });
     } on Exception {
-      print('Failed!');
+      if (kDebugMode) {
+        print('Failed!');
+      }
     }
   }
 
   void transaction() async {
     try {
+      setState(() {
+        dataReceived = [];
+      });
       Stream<Transaction> paymentStream = await pdv.payment(
-          Modalidade.test, 100,
-          cupomFiscal: '1', dataFiscal: DateTime.now());
+        Modalidade.credit.value,
+        100,
+        cupomFiscal: '1',
+        dataFiscal: DateTime.now(),
+      );
 
       if (_isSimulated) {
-        print('here is simulated');
+        if (kDebugMode) {
+          print('here is simulated');
+        }
       }
 
       paymentStream.listen((Transaction transaction) {
@@ -126,7 +226,9 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         transactionStatus = TransactionEvents.transactionError;
       });
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
@@ -137,8 +239,10 @@ class _MyAppState extends State<MyApp> {
         dataReceived = [];
       });
     } on Exception catch (e) {
-      print('Cancel!');
-      print(e.toString());
+      if (kDebugMode) {
+        print('Cancel!');
+        print(e.toString());
+      }
     }
   }
 
@@ -149,25 +253,41 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Column(
-            children: [
-              ElevatedButton(
-                  onPressed: () => pinpad(),
-                  child: Text('Verificar presenca pinpad')),
-              ElevatedButton(
-                  onPressed: () => transaction(),
-                  child: Text('Iniciar transacao')),
-              ElevatedButton(
-                  onPressed: () => cancel(),
-                  child: Text('Cancela ultima transacao')),
-              Text("PinPadInfo:"),
-              Text(pinPadInfo),
-              Text("\n\nTransaction Status:"),
-              Text(transactionStatus.toString()),
-              Text("\n\nData Received:"),
-              Text(dataReceived.join('\n')),
-            ],
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                ElevatedButton(
+                    onPressed: () => pinpad(),
+                    child: const Text('Verificar presenca pinpad')),
+                ElevatedButton(
+                    onPressed: () => transaction(),
+                    child: const Text('Iniciar transacao')),
+                Visibility(
+                  visible: _showAbortButton,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        _abortTransaction = true;
+                      },
+                      child: const Text('Cancelar transacao atual')),
+                ),
+                ElevatedButton(
+                    onPressed: () => cancel(),
+                    child: const Text('Cancela ultima transacao')),
+                const Text("PinPadInfo:"),
+                Text(pinPadInfo),
+                const Text("\n\nTransaction Status:"),
+                Text(transactionStatus.name),
+                const Text("Mensagem Operador:"),
+                Text(_lastMsgCashier),
+                const Text("Mensagem Cliente:"),
+                Text(_lastMsgCustomer),
+                const Text("Mensagem Operador e Cliente:"),
+                Text(_lastMsgCashierCustomer),
+                const Text("\n\nData Received:"),
+                Text(dataReceived.join('\n')),
+              ],
+            ),
           ),
         ),
       ),

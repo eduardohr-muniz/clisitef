@@ -3,7 +3,6 @@ library clisitef;
 import 'package:clisitef/clisitef_sdk.dart';
 import 'package:clisitef/model/clisitef_configuration.dart';
 import 'package:clisitef/model/clisitef_data.dart';
-import 'package:clisitef/model/modalidade.dart';
 import 'package:clisitef/model/pinpad_events.dart';
 import 'package:clisitef/model/pinpad_information.dart';
 import 'package:clisitef/model/transaction.dart';
@@ -14,14 +13,24 @@ import 'package:clisitef/pdv/stream/transaction_stream.dart';
 import 'package:flutter/services.dart';
 
 class CliSiTefPDV {
-  CliSiTefPDV({ required this.client, required this.configuration, this.isSimulated = false }) {
+  CliSiTefPDV(
+      {required this.client,
+      required this.configuration,
+      this.isSimulated = false}) {
     _isReady = _init();
     client.setEventHandler(null, onPinPadEvent);
     client.setDataHandler(onData);
   }
 
   Future _init() async {
-    _isReady = client.configure(configuration.enderecoSitef, configuration.codigoLoja, configuration.numeroTerminal, configuration.cnpjEmpresa, configuration.cnpjLoja);
+    _isReady = client.configure(
+      configuration.enderecoSitef,
+      configuration.codigoLoja,
+      configuration.numeroTerminal,
+      configuration.cnpjEmpresa,
+      configuration.cnpjLoja,
+      configuration.tipoPinPad,
+    );
   }
 
   late Future _isReady;
@@ -44,12 +53,19 @@ class CliSiTefPDV {
 
   DataStream get dataStream => _dataStream;
 
-  Future<Stream<Transaction>> payment(Modalidade modalidade, double valor, { required String cupomFiscal, required DateTime dataFiscal, String operador = '' }) async {
+  Future<Stream<Transaction>> payment(
+    int modalidade,
+    double valor, {
+    required String cupomFiscal,
+    required DateTime dataFiscal,
+    String operador = '',
+  }) async {
     if (_transactionStream != null) {
       throw Exception('Another transaction is already in progress.');
     }
     try {
-      bool success = await client.startTransaction(modalidade, valor, cupomFiscal, dataFiscal, operador);
+      bool success = await client.startTransaction(
+          modalidade, valor, cupomFiscal, dataFiscal, operador);
       if (!success) {
         throw Exception('Unable to start payment process');
       }
@@ -70,7 +86,8 @@ class CliSiTefPDV {
 
   Future<bool> isPinPadPresent() async {
     if (isSimulated) {
-      PinPadInformation pinPadSimulatedInfo = PinPadInformation(isPresent: true);
+      PinPadInformation pinPadSimulatedInfo =
+          PinPadInformation(isPresent: true);
       pinPadSimulatedInfo.isConnected = true;
       pinPadSimulatedInfo.isReady = true;
       pinPadStream.emit(pinPadSimulatedInfo);
@@ -100,10 +117,10 @@ class CliSiTefPDV {
     }
   }
 
-  onTransactionEvent(TransactionEvents event, { PlatformException? exception }) {
+  onTransactionEvent(TransactionEvents event, {PlatformException? exception}) {
     Transaction? t = _transactionStream?.transaction;
     if (t != null) {
-      switch(event) {
+      switch (event) {
         case TransactionEvents.transactionConfirm:
           _transactionStream?.success(true);
           break;
@@ -123,10 +140,10 @@ class CliSiTefPDV {
     }
   }
 
-  onPinPadEvent(PinPadEvents event, { PlatformException? exception }) {
+  onPinPadEvent(PinPadEvents event, {PlatformException? exception}) {
     PinPadInformation pinPad = _pinPadStream.pinPadInfo;
     pinPad.event = event;
-    switch(event) {
+    switch (event) {
       case PinPadEvents.startBluetooth:
         pinPad.waiting = true;
         pinPad.isBluetoothEnabled = false;

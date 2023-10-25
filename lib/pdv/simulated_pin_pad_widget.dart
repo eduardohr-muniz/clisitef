@@ -6,20 +6,20 @@ import 'package:flutter/services.dart';
 class SimulatedPinPadWidget extends StatefulWidget {
   final String title;
   final String options;
-  final submit;
-  final cancel;
+  final Function(String data) submit;
+  final VoidCallback cancel;
   const SimulatedPinPadWidget(
       {super.key,
       this.title = "",
       this.options = "",
-      this.submit,
-      this.cancel});
+      required this.submit,
+      required this.cancel});
 
   @override
-  _SimulatedPinPadWidgetState createState() => _SimulatedPinPadWidgetState();
+  SimulatedPinPadWidgetState createState() => SimulatedPinPadWidgetState();
 }
 
-class _SimulatedPinPadWidgetState extends State<SimulatedPinPadWidget> {
+class SimulatedPinPadWidgetState extends State<SimulatedPinPadWidget> {
   late TextEditingController controller;
 
   @override
@@ -58,7 +58,7 @@ class _SimulatedPinPadWidgetState extends State<SimulatedPinPadWidget> {
             ),
             Expanded(
               child: TextField(
-                decoration: InputDecoration(hintText: ""),
+                decoration: const InputDecoration(hintText: ""),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 controller: controller,
@@ -69,13 +69,13 @@ class _SimulatedPinPadWidgetState extends State<SimulatedPinPadWidget> {
                   widget.submit(controller.text);
                   Navigator.of(context).pop();
                 },
-                child: Text('SUBMIT')),
+                child: const Text('SUBMIT')),
             TextButton(
                 onPressed: () {
                   widget.cancel();
                   Navigator.of(context).pop();
                 },
-                child: Text('CANCEL')),
+                child: const Text('CANCEL')),
           ],
         ),
       ),
