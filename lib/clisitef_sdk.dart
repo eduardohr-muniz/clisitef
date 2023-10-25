@@ -16,7 +16,7 @@ typedef PinPadEvent2Void = void Function(PinPadEvents,
 typedef Data2Void = void Function(CliSiTefData);
 
 abstract class CliSiTefSDK {
-  Future<bool> abortTransaction();
+  Future<bool> abortTransaction({int continua = 0});
 
   Future<bool> continueTransaction(String data);
 
@@ -26,16 +26,23 @@ abstract class CliSiTefSDK {
     String numeroTerminal,
     String cnpjEmpresa,
     String cnpjLoja,
-    TipoPinPad tipoPinPad,
-  );
+    TipoPinPad tipoPinPad, {
+    String parametrosAdicionais = '',
+  });
 
   Future<bool> finishTransaction(
       bool confirma, String cupomFiscal, DateTime dataFiscal);
 
   Future<bool> finishLastTransaction(bool confirma);
 //https://dev.softwareexpress.com.br/docs/sitef-interface-simplificada/tabela_de_codigos_meios_pagamento/ - Muito grande para usar ENUM
-  Future<bool> startTransaction(int modalidade, double valor,
-      String cupomFiscal, DateTime dataFiscal, String operador);
+  Future<bool> startTransaction(
+    int modalidade,
+    double valor,
+    String cupomFiscal,
+    DateTime dataFiscal,
+    String operador, {
+    String restricoes = '',
+  });
 
   Future<int?> getTotalPendingTransactions(
       DateTime dataFiscal, String cupomFiscal);

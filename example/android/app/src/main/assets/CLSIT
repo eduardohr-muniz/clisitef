@@ -9,7 +9,7 @@ DiretorioTrace=./files
 HabilitaTrace=1
 
 [PinPad]
-MensagemPadrao=Teste
+MensagemPadrao=Sitef
 
 [SiTef]
 EnderecoIP=127.0.0.1;10.211.55.3

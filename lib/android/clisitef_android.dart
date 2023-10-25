@@ -53,9 +53,9 @@ class CliSiTefAndroid implements CliSiTefSDK {
   }
 
   @override
-  Future<bool> abortTransaction() async {
+  Future<bool> abortTransaction({int continua = 0}) async {
     bool? success = await _methodChannel
-        .invokeMethod<bool>('abortTransaction', {'continua': 0});
+        .invokeMethod<bool>('abortTransaction', {'continua': continua});
 
     return success ?? false;
   }
@@ -70,8 +70,9 @@ class CliSiTefAndroid implements CliSiTefSDK {
     String numeroTerminal,
     String cnpjEmpresa,
     String cnpjLoja,
-    TipoPinPad tipoPinPad,
-  ) async {
+    TipoPinPad tipoPinPad, {
+    String parametrosAdicionais = '',
+  }) async {
     bool? success = await _methodChannel.invokeMethod<bool>('configure', {
       'enderecoSitef': enderecoSitef,
       'codigoLoja': codigoLoja.padLeft(8, '0'),
@@ -79,6 +80,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
       'cnpjEmpresa': cnpjEmpresa,
       'cnpjLoja': cnpjLoja,
       'tipoPinPad': tipoPinPad.value,
+      'parametrosAdicionais': parametrosAdicionais,
     });
 
     return success ?? false;
@@ -153,8 +155,14 @@ class CliSiTefAndroid implements CliSiTefSDK {
   }
 
   @override
-  Future<bool> startTransaction(int modalidade, double valor,
-      String cupomFiscal, DateTime dataFiscal, String operador) async {
+  Future<bool> startTransaction(
+    int modalidade,
+    double valor,
+    String cupomFiscal,
+    DateTime dataFiscal,
+    String operador, {
+    String restricoes = '',
+  }) async {
     NumberFormat f = NumberFormat("############.00", "pt");
     bool? success =
         await _methodChannel.invokeMethod<bool>('startTransaction', {
@@ -164,6 +172,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
       'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal),
       'horario': DateFormat('hhmmss').format(dataFiscal),
       'operador': operador,
+      'restricoes': restricoes,
     });
 
     return success ?? false;

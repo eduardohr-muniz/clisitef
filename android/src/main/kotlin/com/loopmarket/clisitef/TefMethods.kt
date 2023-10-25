@@ -8,8 +8,8 @@ import java.lang.Exception
 class TefMethods(cliSiTef: CliSiTef): SiTefClient(cliSiTef) {
     var idConfig: Int = 0;
 
-    fun startTransaction(listener: ICliSiTefListener, functionId: Int, trnAmount: String, taxInvoiceNumber: String, taxInvoiceDate: String, taxInvoiceTime: String, cashierOperator: String) {
-        processTransactionStatus(cliSiTef.startTransaction(listener, functionId, trnAmount, taxInvoiceNumber, taxInvoiceDate, taxInvoiceTime, cashierOperator, ""))
+    fun startTransaction(listener: ICliSiTefListener, functionId: Int, trnAmount: String, taxInvoiceNumber: String, taxInvoiceDate: String, taxInvoiceTime: String, cashierOperator: String, restrictions: String) {
+        processTransactionStatus(cliSiTef.startTransaction(listener, functionId, trnAmount, taxInvoiceNumber, taxInvoiceDate, taxInvoiceTime, cashierOperator, restrictions))
     }
 
     fun finishLastTransaction(confirm: Int) {
