@@ -1,18 +1,18 @@
-import 'package:clisitef/model/clisitef_configuration.dart';
-import 'package:clisitef/model/clisitef_data.dart';
-import 'package:clisitef/model/data_events.dart';
-import 'package:clisitef/model/modalidade.dart';
-import 'package:clisitef/model/pinpad_information.dart';
-import 'package:clisitef/model/tipo_pinpad.dart';
-import 'package:clisitef/model/transaction.dart';
-import 'package:clisitef/model/transaction_events.dart';
-import 'package:clisitef/pdv/clisitef_pdv.dart';
-import 'package:clisitef/pdv/simulated_pin_pad_widget.dart';
+import 'package:flutter_clisitef/model/clisitef_configuration.dart';
+import 'package:flutter_clisitef/model/clisitef_data.dart';
+import 'package:flutter_clisitef/model/data_events.dart';
+import 'package:flutter_clisitef/model/modalidade.dart';
+import 'package:flutter_clisitef/model/pinpad_information.dart';
+import 'package:flutter_clisitef/model/tipo_pinpad.dart';
+import 'package:flutter_clisitef/model/transaction.dart';
+import 'package:flutter_clisitef/model/transaction_events.dart';
+import 'package:flutter_clisitef/pdv/clisitef_pdv.dart';
+import 'package:flutter_clisitef/pdv/simulated_pin_pad_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:clisitef/clisitef.dart';
+import 'package:flutter_clisitef/clisitef.dart';
 
 void main() {
   runApp(const MaterialApp(home: MyApp()));
@@ -26,7 +26,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _clisitefPlugin = Clisitef.instance;
+  final _clisitefPlugin = CliSitef.instance;
 
   late CliSiTefPDV pdv;
 
@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
       enderecoSitef: '172.16.93.132',
       codigoLoja: '0',
       numeroTerminal: '1',
-      cnpjEmpresa: '05481336000137',
+      cnpjAutomacao: '05481336000137',
       cnpjLoja: '05481336000137',
       tipoPinPad: TipoPinPad.usb,
     );

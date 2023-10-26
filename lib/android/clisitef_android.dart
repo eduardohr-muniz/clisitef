@@ -1,12 +1,12 @@
 library clisitef;
 
-import 'package:clisitef/clisitef_sdk.dart';
-import 'package:clisitef/model/clisitef_data.dart';
-import 'package:clisitef/model/data_events.dart';
-import 'package:clisitef/model/pinpad_events.dart';
-import 'package:clisitef/model/pinpad_information.dart';
-import 'package:clisitef/model/tipo_pinpad.dart';
-import 'package:clisitef/model/transaction_events.dart';
+import 'package:flutter_clisitef/clisitef_sdk.dart';
+import 'package:flutter_clisitef/model/clisitef_data.dart';
+import 'package:flutter_clisitef/model/data_events.dart';
+import 'package:flutter_clisitef/model/pinpad_events.dart';
+import 'package:flutter_clisitef/model/pinpad_information.dart';
+import 'package:flutter_clisitef/model/tipo_pinpad.dart';
+import 'package:flutter_clisitef/model/transaction_events.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -68,7 +68,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
     String enderecoSitef,
     String codigoLoja,
     String numeroTerminal,
-    String cnpjEmpresa,
+    String cnpjAutomacao,
     String cnpjLoja,
     TipoPinPad tipoPinPad, {
     String parametrosAdicionais = '',
@@ -77,7 +77,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
       'enderecoSitef': enderecoSitef,
       'codigoLoja': codigoLoja.padLeft(8, '0'),
       'numeroTerminal': numeroTerminal.padLeft(8, '0'),
-      'cnpjEmpresa': cnpjEmpresa,
+      'cnpjAutomacao': cnpjAutomacao,
       'cnpjLoja': cnpjLoja,
       'tipoPinPad': tipoPinPad.value,
       'parametrosAdicionais': parametrosAdicionais,
@@ -163,11 +163,11 @@ class CliSiTefAndroid implements CliSiTefSDK {
     String operador, {
     String restricoes = '',
   }) async {
-    NumberFormat f = NumberFormat("############.00", "pt");
+    int valorSitef = (valor * 100).round();
     bool? success =
         await _methodChannel.invokeMethod<bool>('startTransaction', {
       'modalidade': modalidade,
-      'valor': f.format(valor),
+      'valor': valorSitef.toString(),
       'cupomFiscal': cupomFiscal,
       'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal),
       'horario': DateFormat('hhmmss').format(dataFiscal),

@@ -2,7 +2,7 @@ library clisitef;
 
 import 'dart:async';
 
-import 'package:clisitef/model/pinpad_information.dart';
+import 'package:flutter_clisitef/model/pinpad_information.dart';
 
 class PinPadStream {
   final _controller = StreamController<PinPadInformation>.broadcast();
@@ -17,7 +17,7 @@ class PinPadStream {
     _internalPinPadInfo = pinPadInformation;
     _controller.sink.add(_internalPinPadInfo);
   }
-  
+
   void close() {
     _controller.sink.close();
   }
@@ -26,4 +26,3 @@ class PinPadStream {
     _controller.sink.addError(error);
   }
 }
-
