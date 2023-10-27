@@ -14,6 +14,16 @@ buildscript {
     }
 }
 
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        flatDir {
+            dirs project(':flutter_clisitef').file('libs')
+        }        
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -41,10 +51,15 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
+
+    packagingOptions{
+        doNotStrip "**/libclisitef.so"
+    }    
 }
 
 dependencies {
     implementation files('src/main/kotlin/libs/clisitef-android.jar')
+    implementation (name: 'PPCompGPOS720-v1.33-Complete-debug', ext: 'aar')
 }
