@@ -33,6 +33,7 @@ class CliSiTefPDV {
       configuration.cnpjAutomacao,
       configuration.cnpjLoja,
       configuration.tipoPinPad,
+      parametrosAdicionais: configuration.parametrosAdicionais,
     );
   }
 

@@ -60,6 +60,7 @@ class _MyAppState extends State<MyApp> {
       cnpjAutomacao: '05481336000137',
       cnpjLoja: '05481336000137',
       tipoPinPad: TipoPinPad.usb,
+      parametrosAdicionais: '',
     );
 
     pdv = CliSiTefPDV(

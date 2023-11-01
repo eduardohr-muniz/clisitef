@@ -9,7 +9,8 @@ class CliSiTefConfiguration {
       required this.numeroTerminal,
       required this.cnpjLoja,
       required this.cnpjAutomacao,
-      required this.tipoPinPad});
+      required this.tipoPinPad,
+      required this.parametrosAdicionais});
 
   final String enderecoSitef;
 
@@ -22,4 +23,6 @@ class CliSiTefConfiguration {
   final String cnpjAutomacao;
 
   final TipoPinPad tipoPinPad;
+
+  final String parametrosAdicionais;
 }
