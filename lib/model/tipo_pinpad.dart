@@ -1,6 +1,7 @@
 library clisitef;
 
 enum TipoPinPad {
+  nenhum('NENHUM'),
   auto('ANDROID_AUTO'),
   usb('ANDROID_USB'),
   bluetooth('ANDROID_BT'),
