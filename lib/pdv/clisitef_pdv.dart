@@ -134,6 +134,23 @@ class CliSiTefPDV {
     }
   }
 
+  Future<void> confirmTransaction(String data) async {
+    try {
+      await client.finishLastTransaction(true);
+    } on PlatformException catch (e) {
+      if (e.code == '-12') {
+        await client.abortTransaction();
+      } else {
+        rethrow;
+      }
+    }
+
+    if (_transactionStream != null) {
+      _transactionStream!.success(true);
+      _transactionStream!.emit(_transactionStream!.transaction);
+    }
+  }
+
   onTransactionEvent(TransactionEvents event, {PlatformException? exception}) {
     Transaction? t = _transactionStream?.transaction;
     if (t != null) {
