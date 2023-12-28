@@ -134,7 +134,7 @@ class CliSiTefPDV {
     }
   }
 
-  Future<void> confirmTransaction(String data) async {
+  Future<void> confirmTransaction() async {
     try {
       await client.finishLastTransaction(true);
     } on PlatformException catch (e) {
