@@ -11,8 +11,6 @@ class CliSiTefConfiguration {
     required this.cnpjAutomacao,
     required this.tipoPinPad,
     required this.parametrosAdicionais,
-    required this.tipoComunicacao,
-    required this.tokenRegistro,
   });
 
   final String enderecoSitef;
@@ -28,8 +26,4 @@ class CliSiTefConfiguration {
   final TipoPinPad tipoPinPad;
 
   final String parametrosAdicionais;
-
-  final String tipoComunicacao;
-
-  final String tokenRegistro;
 }
