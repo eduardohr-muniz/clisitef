@@ -61,6 +61,8 @@ class _MyAppState extends State<MyApp> {
       cnpjLoja: '05481336000137',
       tipoPinPad: TipoPinPad.usb,
       parametrosAdicionais: '',
+      tipoComunicacao: 'TLSGWP',
+      tokenRegistro: '1111-2222-3333-4444',
     );
 
     pdv = CliSiTefPDV(
