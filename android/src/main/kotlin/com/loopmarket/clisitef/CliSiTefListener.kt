@@ -74,7 +74,7 @@ class CliSiTefListener(private val cliSiTef: CliSiTef): ICliSiTefListener {
         if (currentStage == 1) {
             if (resultCode == 0) {
                 try {
-                    cliSiTef.finishTransaction(1)
+                    // cliSiTef.finishTransaction(1)
                     eventSink?.success(TransactionEvents.TRANSACTION_CONFIRM.named)
                 } catch (e: Exception) {
                     eventSink?.error(TransactionEvents.TRANSACTION_FAILED.named, e.toString(), e)
