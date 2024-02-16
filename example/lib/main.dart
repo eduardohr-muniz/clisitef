@@ -54,12 +54,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     CliSiTefConfiguration configuration = CliSiTefConfiguration(
-      enderecoSitef: '172.16.93.190',
+      enderecoSitef: '172.16.93.110',
       codigoLoja: '0',
       numeroTerminal: '1',
       cnpjAutomacao: '05481336000137',
       cnpjLoja: '05481336000137',
-      tipoPinPad: TipoPinPad.usb,
+      tipoPinPad: TipoPinPad.apos,
       parametrosAdicionais: '',
     );
 
@@ -295,11 +295,11 @@ class _MyAppState extends State<MyApp> {
         dataReceived = [];
       });
       Stream<Transaction> paymentStream = await pdv.payment(
-        Modalidade.credito.value,
+        Modalidade.debito.value,
         100,
         cupomFiscal: '1',
         dataFiscal: DateTime.now(),
-        restricoes: '[27;28]',
+        // restricoes: '[27;28]',
       );
 
       if (_isSimulated) {
