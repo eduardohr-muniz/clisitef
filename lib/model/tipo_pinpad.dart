@@ -10,4 +10,11 @@ enum TipoPinPad {
 
   const TipoPinPad(this.value);
   final String value;
+
+  static TipoPinPad fromString(String value) {
+    final tipoPinPad =
+        TipoPinPad.values.firstWhere((filter) => filter.value == value);
+
+    return tipoPinPad;
+  }
 }
