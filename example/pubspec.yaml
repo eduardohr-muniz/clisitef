@@ -18,7 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  clisitef:
+  flutter_clisitef:
     # When depending on this package from a real application you should use:
     #   clisitef: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints

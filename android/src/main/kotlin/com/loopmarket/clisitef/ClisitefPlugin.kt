@@ -1,6 +1,7 @@
 package com.loopmarket.clisitef
 
 import android.os.Looper
+import android.app.Activity
 import androidx.annotation.NonNull
 import br.com.softwareexpress.sitef.android.CliSiTef
 import com.loopmarket.clisitef.channel.DataHandler
@@ -11,15 +12,20 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.Log
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 
 /** ClisitefPlugin */
-class ClisitefPlugin: FlutterPlugin, MethodCallHandler {
+class ClisitefPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var methodChannel : MethodChannel
 
-  private lateinit var eventChannel : EventChannel
+  private lateinit var activity: Activity
 
-  private lateinit var dataChannel : EventChannel
+  private lateinit var eventChannel: EventChannel
+
+  private lateinit var dataChannel: EventChannel
 
   private lateinit var cliSiTef: CliSiTef
 
@@ -31,11 +37,39 @@ class ClisitefPlugin: FlutterPlugin, MethodCallHandler {
 
   private val CHANNEL = "com.loopmarket.clisitef"
 
+  override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
+    activity = activityPluginBinding.activity
+
+    if(cliSiTef != null){
+      cliSiTef.setActivity(activity)
+    }
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    if(cliSiTef != null){
+      cliSiTef.setActivity(null)
+    }
+  }
+
+  override fun onReattachedToActivityForConfigChanges(activityPluginBinding: ActivityPluginBinding) {
+    activity = activityPluginBinding.activity
+
+    if(cliSiTef != null){
+      cliSiTef.setActivity(activity)
+    }
+
+  }
+
+  override fun onDetachedFromActivity() {
+    if(cliSiTef != null){
+      cliSiTef.setActivity(null)
+    }
+  }
+
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL)
-    methodChannel.setMethodCallHandler(this)
 
-    cliSiTef = CliSiTef(flutterPluginBinding.applicationContext);
+    cliSiTef = CliSiTef(flutterPluginBinding.applicationContext)
 
     cliSiTefListener = CliSiTefListener(cliSiTef)
 
@@ -49,6 +83,8 @@ class ClisitefPlugin: FlutterPlugin, MethodCallHandler {
 
     tefMethods = TefMethods(cliSiTef)
     pinPadMethods = PinPadMethods(cliSiTef)
+
+    methodChannel.setMethodCallHandler(this)
   }
 
 
@@ -59,7 +95,7 @@ class ClisitefPlugin: FlutterPlugin, MethodCallHandler {
       "setPinpadDisplayMessage" -> pinPadMethods.setDisplayMessage(call.argument<String>("message")!!)
       "pinpadReadYesNo" -> pinPadMethods.readYesOrNo(call.argument<String>("message")!!)
       "pinpadIsPresent" -> pinPadMethods.isPresent()
-      "configure" -> tefMethods.configure(call.argument<String>("enderecoSitef")!!, call.argument<String>("codigoLoja")!!, call.argument<String>("numeroTerminal")!!, "[TipoPinPad="+call.argument<String>("tipoPinPad")!!+"];[ParmsClient=1="+call.argument<String>("cnpjLoja")!!+";2="+call.argument<String>("cnpjEmpresa")!!+"];["+call.argument<String>("parametrosAdicionais")!!+"]")
+      "configure" -> tefMethods.configure(call.argument<String>("enderecoSitef")!!, call.argument<String>("codigoLoja")!!, call.argument<String>("numeroTerminal")!!, "[[TipoPinPad="+call.argument<String>("tipoPinPad")!!+"];[ParmsClient=1="+call.argument<String>("cnpjLoja")!!+";2="+call.argument<String>("cnpjAutomacao")!!+"]];"+call.argument<String>("parametrosAdicionais")!!)
       "getQttPendingTransactions" -> tefMethods.getQttPendingTransactions(call.argument<String>("dataFiscal")!!, call.argument<String>("cupomFiscal")!!)
       "startTransaction" -> tefMethods.startTransaction(cliSiTefListener, call.argument<Int>("modalidade")!!, call.argument<String>("valor")!!, call.argument<String>("cupomFiscal")!!, call.argument<String>("dataFiscal")!!, call.argument<String>("horario")!!, call.argument<String>("operador")!!, call.argument<String>("restricoes")!!)
       "finishLastTransaction" -> tefMethods.finishLastTransaction(call.argument<Int>("confirma")!!)

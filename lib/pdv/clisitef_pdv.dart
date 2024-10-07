@@ -1,17 +1,17 @@
 library clisitef;
 
-import 'package:clisitef/clisitef_sdk.dart';
-import 'package:clisitef/model/clisitef_configuration.dart';
-import 'package:clisitef/model/clisitef_data.dart';
-import 'package:clisitef/model/clisitef_resp.dart';
+import 'package:flutter_clisitef/clisitef_sdk.dart';
+import 'package:flutter_clisitef/model/clisitef_configuration.dart';
+import 'package:flutter_clisitef/model/clisitef_data.dart';
+import 'package:flutter_clisitef/model/clisitef_resp.dart';
 
-import 'package:clisitef/model/pinpad_events.dart';
-import 'package:clisitef/model/pinpad_information.dart';
-import 'package:clisitef/model/transaction.dart';
-import 'package:clisitef/model/transaction_events.dart';
-import 'package:clisitef/pdv/stream/data_stream.dart';
-import 'package:clisitef/pdv/stream/pin_pad_stream.dart';
-import 'package:clisitef/pdv/stream/transaction_stream.dart';
+import 'package:flutter_clisitef/model/pinpad_events.dart';
+import 'package:flutter_clisitef/model/pinpad_information.dart';
+import 'package:flutter_clisitef/model/transaction.dart';
+import 'package:flutter_clisitef/model/transaction_events.dart';
+import 'package:flutter_clisitef/pdv/stream/data_stream.dart';
+import 'package:flutter_clisitef/pdv/stream/pin_pad_stream.dart';
+import 'package:flutter_clisitef/pdv/stream/transaction_stream.dart';
 import 'package:flutter/services.dart';
 
 class CliSiTefPDV {
@@ -30,9 +30,10 @@ class CliSiTefPDV {
       configuration.enderecoSitef,
       configuration.codigoLoja,
       configuration.numeroTerminal,
-      configuration.cnpjEmpresa,
+      configuration.cnpjAutomacao,
       configuration.cnpjLoja,
       configuration.tipoPinPad,
+      parametrosAdicionais: configuration.parametrosAdicionais,
     );
   }
 
@@ -133,6 +134,23 @@ class CliSiTefPDV {
     }
   }
 
+  Future<void> confirmTransaction() async {
+    try {
+      await client.finishLastTransaction(true);
+    } on PlatformException catch (e) {
+      if (e.code == '-12') {
+        await client.abortTransaction();
+      } else {
+        rethrow;
+      }
+    }
+
+    if (_transactionStream != null) {
+      _transactionStream!.success(true);
+      _transactionStream!.emit(_transactionStream!.transaction);
+    }
+  }
+
   onTransactionEvent(TransactionEvents event, {PlatformException? exception}) {
     Transaction? t = _transactionStream?.transaction;
     if (t != null) {
@@ -204,130 +222,193 @@ class CliSiTefPDV {
     switch (data.fieldId) {
       case 29:
         cliSiTefResp.digitado = true;
+        break;
       case 100:
         cliSiTefResp.modalidadePagamento = data.buffer;
+        break;
       case 101:
         cliSiTefResp.modalidadePagtoExtenso = data.buffer;
+        break;
       case 102:
         cliSiTefResp.modalidadePagtoDescrita = data.buffer;
+        break;
       case 105:
         cliSiTefResp.dataHoraTransacao = data.buffer;
+        break;
       case 106:
         cliSiTefResp.idCarteiraDigital = data.buffer;
+        break;
       case 107:
         cliSiTefResp.nomeCarteiraDigital = data.buffer;
+        break;
       case 110:
         cliSiTefResp.modalidadeCancelamento = data.buffer;
+        break;
       case 111:
         cliSiTefResp.modalidadeCancelamentoExtenso = data.buffer;
+        break;
       case 112:
         cliSiTefResp.modalidadeCancelamentoDescrita = data.buffer;
+        break;
       case 120:
         cliSiTefResp.autenticacao = data.buffer;
+        break;
       case 121:
         cliSiTefResp.viaCliente = data.buffer;
+        break;
       case 122:
         cliSiTefResp.viaEstabelecimento = data.buffer;
+        break;
       case 123:
         cliSiTefResp.tipoComprovante = data.buffer;
+        break;
       case 125:
         cliSiTefResp.codigoVoucher = data.buffer;
+        break;
       case 130:
         cliSiTefResp.saque = double.parse(data.buffer);
+        break;
       case 131:
         cliSiTefResp.instituicao = data.buffer;
+        break;
       case 132:
         cliSiTefResp.codigoBandeiraPadrao = data.buffer;
+        break;
       case 133:
         cliSiTefResp.nsuTef = data.buffer;
+        break;
       case 134:
         cliSiTefResp.nsuHost = data.buffer;
+        break;
       case 135:
         cliSiTefResp.codigoAutorizacao = data.buffer;
+        break;
       case 136:
         cliSiTefResp.bin = data.buffer;
+        break;
       case 137:
         cliSiTefResp.saldoAPagar = double.parse(data.buffer);
+        break;
       case 138:
         cliSiTefResp.valorTotalRecebido = double.parse(data.buffer);
+        break;
       case 139:
         cliSiTefResp.valorEntrada = double.parse(data.buffer);
+        break;
       case 140:
         cliSiTefResp.dataPrimeiraParcela = data.buffer;
+        break;
       case 143:
         cliSiTefResp.valorGorjeta = double.parse(data.buffer);
+        break;
       case 144:
         cliSiTefResp.valorDevolucao = double.parse(data.buffer);
+        break;
       case 145:
         cliSiTefResp.valorPagamento = double.parse(data.buffer);
+        break;
       case 146:
         cliSiTefResp.valorASerCancelado = double.parse(data.buffer);
+        break;
       case 155:
         cliSiTefResp.tipoCartaoBonus = data.buffer;
+        break;
       case 156:
         cliSiTefResp.nomeInstituicao = data.buffer;
+        break;
       case 157:
         cliSiTefResp.codigoEstabelecimento = data.buffer;
+        break;
       case 158:
         cliSiTefResp.codigoRedeAutorizadora = data.buffer;
+        break;
       case 160:
         cliSiTefResp.numeroCupomOriginal = data.buffer;
+        break;
       case 161:
         cliSiTefResp.numeroIdentificadorCupomPagamento = data.buffer;
+        break;
       case 200:
         cliSiTefResp.saldoDisponivel = double.parse(data.buffer);
+        break;
       case 201:
         cliSiTefResp.saldoBloqueado = double.parse(data.buffer);
+        break;
       case 501:
         cliSiTefResp.tipoDocumentoConsultado = data.buffer;
+        break;
       case 502:
         cliSiTefResp.numeroDocumento = data.buffer;
+        break;
       case 504:
         cliSiTefResp.taxaServico = double.tryParse(data.buffer) ?? 0;
+        break;
       case 505:
         cliSiTefResp.numeroParcelas = int.tryParse(data.buffer) ?? 0;
+        break;
       case 506:
         cliSiTefResp.dataPreDatado = data.buffer;
+        break;
       case 507:
         cliSiTefResp.primeiraParcela = data.buffer;
+        break;
       case 508:
         cliSiTefResp.diasEntreParcelas = int.tryParse(data.buffer) ?? 0;
+        break;
       case 509:
         cliSiTefResp.mesFechado = data.buffer;
+        break;
       case 510:
         cliSiTefResp.garantia = data.buffer;
+        break;
       case 511:
         cliSiTefResp.numeroParcelasCDC = int.tryParse(data.buffer) ?? 0;
+        break;
       case 512:
         cliSiTefResp.numeroCartaoCreditoDigitado = data.buffer;
+        break;
       case 513:
         cliSiTefResp.dataVencimentoCartao = data.buffer;
+        break;
       case 514:
         cliSiTefResp.codigoSegurancaCartao = data.buffer;
+        break;
       case 515:
         cliSiTefResp.dataTransacaoCanceladaReimpressa = data.buffer;
+        break;
       case 516:
         cliSiTefResp.numeroDocumentoCanceladoReimpresso = data.buffer;
+        break;
       case 670:
         cliSiTefResp.dadoPinPad = data.buffer;
+        break;
       case 950:
         cliSiTefResp.cnpjCredenciadoraNFCE = data.buffer;
+        break;
       case 951:
         cliSiTefResp.bandeiraNFCE = data.buffer;
+        break;
       case 952:
         cliSiTefResp.numeroAutorizacaoNFCE = data.buffer;
+        break;
       case 953:
         cliSiTefResp.codigoCredenciadoraSAT = data.buffer;
+        break;
       case 1002:
         cliSiTefResp.dataValidadeCartao = data.buffer;
+        break;
       case 1003:
         cliSiTefResp.nomePortadorCartao = data.buffer;
+        break;
       case 1190:
         cliSiTefResp.ultimosQuatroDigitosCartao = data.buffer;
+        break;
       case 1321:
         cliSiTefResp.nsuHostAutorizadorTransacaoCancelada = data.buffer;
+        break;
       case 4153:
         cliSiTefResp.codigoPSP = data.buffer;
+        break;
     }
     _dataStream.sink.add(data);
   }

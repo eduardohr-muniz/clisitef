@@ -1,10 +1,10 @@
 library clisitef;
 
-import 'package:clisitef/model/clisitef_data.dart';
-import 'package:clisitef/model/pinpad_events.dart';
-import 'package:clisitef/model/pinpad_information.dart';
-import 'package:clisitef/model/tipo_pinpad.dart';
-import 'package:clisitef/model/transaction_events.dart';
+import 'package:flutter_clisitef/model/clisitef_data.dart';
+import 'package:flutter_clisitef/model/pinpad_events.dart';
+import 'package:flutter_clisitef/model/pinpad_information.dart';
+import 'package:flutter_clisitef/model/tipo_pinpad.dart';
+import 'package:flutter_clisitef/model/transaction_events.dart';
 import 'package:flutter/services.dart';
 
 typedef TransactionEvent2Void = void Function(TransactionEvents,
@@ -24,7 +24,7 @@ abstract class CliSiTefSDK {
     String enderecoSitef,
     String codigoLoja,
     String numeroTerminal,
-    String cnpjEmpresa,
+    String cnpjAutomacao,
     String cnpjLoja,
     TipoPinPad tipoPinPad, {
     String parametrosAdicionais = '',
