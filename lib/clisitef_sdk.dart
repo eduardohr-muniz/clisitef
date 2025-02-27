@@ -1,17 +1,15 @@
 library clisitef;
 
-import 'package:flutter_clisitef/model/clisitef_data.dart';
-import 'package:flutter_clisitef/model/pinpad_events.dart';
-import 'package:flutter_clisitef/model/pinpad_information.dart';
-import 'package:flutter_clisitef/model/tipo_pinpad.dart';
-import 'package:flutter_clisitef/model/transaction_events.dart';
+import 'package:clisitef/model/clisitef_data.dart';
+import 'package:clisitef/model/pinpad_events.dart';
+import 'package:clisitef/model/pinpad_information.dart';
+import 'package:clisitef/model/tipo_pinpad.dart';
+import 'package:clisitef/model/transaction_events.dart';
 import 'package:flutter/services.dart';
 
-typedef TransactionEvent2Void = void Function(TransactionEvents,
-    {PlatformException? exception});
+typedef TransactionEvent2Void = void Function(TransactionEvents, {PlatformException? exception});
 
-typedef PinPadEvent2Void = void Function(PinPadEvents,
-    {PlatformException? exception});
+typedef PinPadEvent2Void = void Function(PinPadEvents, {PlatformException? exception});
 
 typedef Data2Void = void Function(CliSiTefData);
 
@@ -30,8 +28,7 @@ abstract class CliSiTefSDK {
     String parametrosAdicionais = '',
   });
 
-  Future<bool> finishTransaction(
-      bool confirma, String cupomFiscal, DateTime dataFiscal);
+  Future<bool> finishTransaction(bool confirma, String cupomFiscal, DateTime dataFiscal);
 
   Future<bool> finishLastTransaction(bool confirma);
 //https://dev.softwareexpress.com.br/docs/sitef-interface-simplificada/tabela_de_codigos_meios_pagamento/ - Muito grande para usar ENUM
@@ -44,8 +41,7 @@ abstract class CliSiTefSDK {
     String restricoes = '',
   });
 
-  Future<int?> getTotalPendingTransactions(
-      DateTime dataFiscal, String cupomFiscal);
+  Future<int?> getTotalPendingTransactions(DateTime dataFiscal, String cupomFiscal);
 
   Future<PinPadInformation> getPinpadInformation();
 
@@ -53,8 +49,7 @@ abstract class CliSiTefSDK {
 
   Future<int?> setPinpadDisplayMessage(String message);
 
-  void setEventHandler(TransactionEvent2Void? transactionEventHandler,
-      PinPadEvent2Void? pinPadEventHandler);
+  void setEventHandler(TransactionEvent2Void? transactionEventHandler, PinPadEvent2Void? pinPadEventHandler);
 
   void setDataHandler(Data2Void listener);
 }

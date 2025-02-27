@@ -1,61 +1,51 @@
 library clisitef;
 
-import 'package:flutter_clisitef/clisitef_sdk.dart';
-import 'package:flutter_clisitef/model/clisitef_data.dart';
-import 'package:flutter_clisitef/model/data_events.dart';
-import 'package:flutter_clisitef/model/pinpad_events.dart';
-import 'package:flutter_clisitef/model/pinpad_information.dart';
-import 'package:flutter_clisitef/model/tipo_pinpad.dart';
-import 'package:flutter_clisitef/model/transaction_events.dart';
+import 'package:clisitef/clisitef_sdk.dart';
+import 'package:clisitef/model/clisitef_data.dart';
+import 'package:clisitef/model/data_events.dart';
+import 'package:clisitef/model/pinpad_events.dart';
+import 'package:clisitef/model/pinpad_information.dart';
+import 'package:clisitef/model/tipo_pinpad.dart';
+import 'package:clisitef/model/transaction_events.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class CliSiTefAndroid implements CliSiTefSDK {
   CliSiTefAndroid._privateConstructor();
 
-  static final CliSiTefAndroid _instance =
-      CliSiTefAndroid._privateConstructor();
+  static final CliSiTefAndroid _instance = CliSiTefAndroid._privateConstructor();
 
-  static const MethodChannel _methodChannel =
-      MethodChannel('com.loopmarket.clisitef');
+  static const MethodChannel _methodChannel = MethodChannel('com.loopmarket.clisitef');
 
-  static const EventChannel _eventChannel =
-      EventChannel('com.loopmarket.clisitef/events');
+  static const EventChannel _eventChannel = EventChannel('com.loopmarket.clisitef/events');
 
-  static const EventChannel _dataChannel =
-      EventChannel('com.loopmarket.clisitef/events/data');
+  static const EventChannel _dataChannel = EventChannel('com.loopmarket.clisitef/events/data');
 
   factory CliSiTefAndroid() {
     return _instance;
   }
 
   @override
-  void setEventHandler(TransactionEvent2Void? transactionEventHandler,
-      PinPadEvent2Void? pinPadEventHandler) {
-    _eventChannel.receiveBroadcastStream().listen(
-        (event) =>
-            handleEvent(event, transactionEventHandler, pinPadEventHandler),
-        onError: (event) =>
-            handleError(event, transactionEventHandler, pinPadEventHandler));
+  void setEventHandler(TransactionEvent2Void? transactionEventHandler, PinPadEvent2Void? pinPadEventHandler) {
+    _eventChannel.receiveBroadcastStream().listen((event) => handleEvent(event, transactionEventHandler, pinPadEventHandler),
+        onError: (event) => handleError(event, transactionEventHandler, pinPadEventHandler));
   }
 
   @override
   void setDataHandler(Data2Void listener) {
-    _dataChannel.receiveBroadcastStream().listen((dataEvent) => listener(
-        CliSiTefData(
-            event: dataEvent['event'].toString().dataEvent,
-            currentStage: dataEvent['currentStage'],
-            buffer: dataEvent['buffer'],
-            waiting: !dataEvent['shouldContinue'],
-            fieldId: dataEvent['fieldId'],
-            maxLength: dataEvent['maxLength'],
-            minLength: dataEvent['minLength'])));
+    _dataChannel.receiveBroadcastStream().listen((dataEvent) => listener(CliSiTefData(
+        event: dataEvent['event'].toString().dataEvent,
+        currentStage: dataEvent['currentStage'],
+        buffer: dataEvent['buffer'],
+        waiting: !dataEvent['shouldContinue'],
+        fieldId: dataEvent['fieldId'],
+        maxLength: dataEvent['maxLength'],
+        minLength: dataEvent['minLength'])));
   }
 
   @override
   Future<bool> abortTransaction({int continua = 0}) async {
-    bool? success = await _methodChannel
-        .invokeMethod<bool>('abortTransaction', {'continua': continua});
+    bool? success = await _methodChannel.invokeMethod<bool>('abortTransaction', {'continua': continua});
 
     return success ?? false;
   }
@@ -87,10 +77,8 @@ class CliSiTefAndroid implements CliSiTefSDK {
   }
 
   @override
-  Future<bool> finishTransaction(
-      bool confirma, String cupomFiscal, DateTime dataFiscal) async {
-    bool? success =
-        await _methodChannel.invokeMethod<bool>('finishTransaction', {
+  Future<bool> finishTransaction(bool confirma, String cupomFiscal, DateTime dataFiscal) async {
+    bool? success = await _methodChannel.invokeMethod<bool>('finishTransaction', {
       'confirma': confirma == true ? 1 : 0,
       'cupomFiscal': cupomFiscal,
       'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal),
@@ -102,8 +90,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
 
   @override
   Future<bool> finishLastTransaction(bool confirma) async {
-    bool? success =
-        await _methodChannel.invokeMethod<bool>('finishLastTransaction', {
+    bool? success = await _methodChannel.invokeMethod<bool>('finishLastTransaction', {
       'confirma': confirma == true ? 1 : 0,
     });
 
@@ -112,8 +99,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
 
   @override
   Future<bool> continueTransaction(String data) async {
-    bool? success =
-        await _methodChannel.invokeMethod<bool>('continueTransaction', {
+    bool? success = await _methodChannel.invokeMethod<bool>('continueTransaction', {
       'data': data,
     });
 
@@ -122,8 +108,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
 
   @override
   Future<int> getPinPadYesOrNo(String message) async {
-    int? result = await _methodChannel
-        .invokeMethod<int>('pinpadReadYesNo', {'message': message});
+    int? result = await _methodChannel.invokeMethod<int>('pinpadReadYesNo', {'message': message});
     if (result == null) {
       throw Exception('Could not retrieve pinpad information');
     }
@@ -132,26 +117,20 @@ class CliSiTefAndroid implements CliSiTefSDK {
 
   @override
   Future<PinPadInformation> getPinpadInformation() async {
-    bool? isPresent =
-        await _methodChannel.invokeMethod<bool>('pinpadIsPresent');
+    bool? isPresent = await _methodChannel.invokeMethod<bool>('pinpadIsPresent');
 
     return PinPadInformation(isPresent: isPresent ?? false);
   }
 
   @override
-  Future<int?> getTotalPendingTransactions(
-      DateTime dataFiscal, String cupomFiscal) async {
+  Future<int?> getTotalPendingTransactions(DateTime dataFiscal, String cupomFiscal) async {
     return await _methodChannel
-        .invokeMethod<int?>('getQttPendingTransactions', {
-      'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal),
-      'cupomFiscal': cupomFiscal
-    });
+        .invokeMethod<int?>('getQttPendingTransactions', {'dataFiscal': DateFormat('yyyyMMdd').format(dataFiscal), 'cupomFiscal': cupomFiscal});
   }
 
   @override
   Future<int?> setPinpadDisplayMessage(String message) async {
-    return await _methodChannel
-        .invokeMethod<int>('setPinpadDisplayMessage', {'message': message});
+    return await _methodChannel.invokeMethod<int>('setPinpadDisplayMessage', {'message': message});
   }
 
   @override
@@ -164,8 +143,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
     String restricoes = '',
   }) async {
     int valorSitef = (valor * 100).round();
-    bool? success =
-        await _methodChannel.invokeMethod<bool>('startTransaction', {
+    bool? success = await _methodChannel.invokeMethod<bool>('startTransaction', {
       'modalidade': modalidade,
       'valor': valorSitef.toString(),
       'cupomFiscal': cupomFiscal,
@@ -178,8 +156,7 @@ class CliSiTefAndroid implements CliSiTefSDK {
     return success ?? false;
   }
 
-  handleEvent(String event, TransactionEvent2Void? transactionEventHandler,
-      PinPadEvent2Void? pinPadEventHandler) {
+  handleEvent(String event, TransactionEvent2Void? transactionEventHandler, PinPadEvent2Void? pinPadEventHandler) {
     if (transactionEventHandler != null) {
       if (event.transactionEvent != TransactionEvents.unknown) {
         transactionEventHandler(event.transactionEvent);
@@ -193,14 +170,10 @@ class CliSiTefAndroid implements CliSiTefSDK {
     }
   }
 
-  handleError(
-      PlatformException exception,
-      TransactionEvent2Void? transactionEventHandler,
-      PinPadEvent2Void? pinPadEventHandler) {
+  handleError(PlatformException exception, TransactionEvent2Void? transactionEventHandler, PinPadEvent2Void? pinPadEventHandler) {
     if (transactionEventHandler != null) {
       if (exception.code.transactionEvent != TransactionEvents.unknown) {
-        transactionEventHandler(exception.code.transactionEvent,
-            exception: exception);
+        transactionEventHandler(exception.code.transactionEvent, exception: exception);
       }
     }
 

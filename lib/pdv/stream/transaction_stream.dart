@@ -2,20 +2,12 @@ library clisitef;
 
 import 'dart:async';
 
-import 'package:flutter_clisitef/model/transaction.dart';
-import 'package:flutter_clisitef/model/transaction_events.dart';
+import 'package:clisitef/model/transaction.dart';
+import 'package:clisitef/model/transaction_events.dart';
 
 class TransactionStream {
-  TransactionStream(
-      {void Function()? onListen,
-      void Function()? onPause,
-      void Function()? onResume,
-      FutureOr<void> Function()? onCancel}) {
-    _controller = StreamController<Transaction>(
-        onCancel: onCancel,
-        onListen: onListen,
-        onPause: onPause,
-        onResume: onResume);
+  TransactionStream({void Function()? onListen, void Function()? onPause, void Function()? onResume, FutureOr<void> Function()? onCancel}) {
+    _controller = StreamController<Transaction>(onCancel: onCancel, onListen: onListen, onPause: onPause, onResume: onResume);
   }
 
   StreamController<Transaction> _controller = StreamController<Transaction>();

@@ -1,24 +1,21 @@
 library clisitef;
 
-import 'package:flutter_clisitef/clisitef_sdk.dart';
-import 'package:flutter_clisitef/model/clisitef_configuration.dart';
-import 'package:flutter_clisitef/model/clisitef_data.dart';
-import 'package:flutter_clisitef/model/clisitef_resp.dart';
+import 'package:clisitef/clisitef_sdk.dart';
+import 'package:clisitef/model/clisitef_configuration.dart';
+import 'package:clisitef/model/clisitef_data.dart';
+import 'package:clisitef/model/clisitef_resp.dart';
 
-import 'package:flutter_clisitef/model/pinpad_events.dart';
-import 'package:flutter_clisitef/model/pinpad_information.dart';
-import 'package:flutter_clisitef/model/transaction.dart';
-import 'package:flutter_clisitef/model/transaction_events.dart';
-import 'package:flutter_clisitef/pdv/stream/data_stream.dart';
-import 'package:flutter_clisitef/pdv/stream/pin_pad_stream.dart';
-import 'package:flutter_clisitef/pdv/stream/transaction_stream.dart';
+import 'package:clisitef/model/pinpad_events.dart';
+import 'package:clisitef/model/pinpad_information.dart';
+import 'package:clisitef/model/transaction.dart';
+import 'package:clisitef/model/transaction_events.dart';
+import 'package:clisitef/pdv/stream/data_stream.dart';
+import 'package:clisitef/pdv/stream/pin_pad_stream.dart';
+import 'package:clisitef/pdv/stream/transaction_stream.dart';
 import 'package:flutter/services.dart';
 
 class CliSiTefPDV {
-  CliSiTefPDV(
-      {required this.client,
-      required this.configuration,
-      this.isSimulated = false}) {
+  CliSiTefPDV({required this.client, required this.configuration, this.isSimulated = false}) {
     cliSiTefResp = CliSiTefResp();
     _isReady = _init();
     client.setEventHandler(null, onPinPadEvent);
@@ -103,8 +100,7 @@ class CliSiTefPDV {
 
   Future<bool> isPinPadPresent() async {
     if (isSimulated) {
-      PinPadInformation pinPadSimulatedInfo =
-          PinPadInformation(isPresent: true);
+      PinPadInformation pinPadSimulatedInfo = PinPadInformation(isPresent: true);
       pinPadSimulatedInfo.isConnected = true;
       pinPadSimulatedInfo.isReady = true;
       pinPadStream.emit(pinPadSimulatedInfo);

@@ -2,7 +2,7 @@ library clisitef;
 
 import 'dart:async';
 
-import 'package:flutter_clisitef/model/clisitef_data.dart';
+import 'package:clisitef/model/clisitef_data.dart';
 
 class DataStream {
   final _controller = StreamController<CliSiTefData>.broadcast();
