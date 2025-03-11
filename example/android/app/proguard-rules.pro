@@ -1,0 +1,3 @@
+-keep class rede.smartrede.sdk.* { ; }
+-keep class br.com.setis.* { ; }
+-keep class br.com.softwareexpress.* { ; }

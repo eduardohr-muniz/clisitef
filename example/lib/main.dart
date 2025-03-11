@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:clisitef/model/clisitef_configuration.dart';
 import 'package:clisitef/model/clisitef_data.dart';
 import 'package:clisitef/model/data_events.dart';
@@ -55,12 +57,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     CliSiTefConfiguration configuration = CliSiTefConfiguration(
-      enderecoSitef: '172.16.93.110',
-      codigoLoja: '0',
-      numeroTerminal: '1',
+      enderecoSitef: 'intranet5.wbagestao.com',
+      codigoLoja: '00000000',
+      numeroTerminal: '000009',
       cnpjAutomacao: '05481336000137',
       cnpjLoja: '05481336000137',
-      tipoPinPad: TipoPinPad.apos,
+      tipoPinPad: TipoPinPad.auto,
       parametrosAdicionais: '',
     );
 
@@ -80,8 +82,8 @@ class _MyAppState extends State<MyApp> {
 
     pdv.dataStream.stream.listen((CliSiTefData event) {
       if (kDebugMode) {
-        print(event.buffer);
-        print(event.event);
+        log(event.buffer);
+        log(event.event.toString());
       }
 
       if (event.event == DataEvents.menuTitle) {
@@ -283,7 +285,7 @@ class _MyAppState extends State<MyApp> {
       });
     } on Exception {
       if (kDebugMode) {
-        print('Failed!');
+        log('Failed!');
       }
     }
   }
@@ -294,7 +296,7 @@ class _MyAppState extends State<MyApp> {
         dataReceived = [];
       });
       Stream<Transaction> paymentStream = await pdv.payment(
-        Modalidade.debito.value,
+        Modalidade.vendaCarteiraDigital.value,
         100,
         cupomFiscal: '1',
         dataFiscal: DateTime.now(),
@@ -303,7 +305,7 @@ class _MyAppState extends State<MyApp> {
 
       if (_isSimulated) {
         if (kDebugMode) {
-          print('here is simulated');
+          log('here is simulated');
         }
       }
 
@@ -326,7 +328,7 @@ class _MyAppState extends State<MyApp> {
         transactionStatus = TransactionEvents.transactionError;
       });
       if (kDebugMode) {
-        print(e.toString());
+        log(e.toString());
       }
     }
   }
@@ -336,8 +338,8 @@ class _MyAppState extends State<MyApp> {
       await pdv.client.abortTransaction(continua: 1);
     } on Exception catch (e) {
       if (kDebugMode) {
-        print('Cancel!');
-        print(e.toString());
+        log('Cancel!');
+        log(e.toString());
       }
     }
   }
@@ -350,8 +352,8 @@ class _MyAppState extends State<MyApp> {
       });
     } on Exception catch (e) {
       if (kDebugMode) {
-        print('Cancel!');
-        print(e.toString());
+        log('Cancel!');
+        log(e.toString());
       }
     }
   }
